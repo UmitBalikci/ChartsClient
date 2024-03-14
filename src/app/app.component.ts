@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import * as Signalr from "@microsoft/signalr";
+import * as signalr from "@microsoft/signalr";
 
 import * as Highcharts from "highcharts";
 
@@ -10,6 +10,15 @@ import * as Highcharts from "highcharts";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  connection : signalR.HubConnection; 
+  constructor() {
+    this.connection = new signalr.HubConnectionBuilder().withUrl("https://localhost:7172/charthub").build();      
+    this.connection.start();
+
+    this.connection.on("receiveMessage", message => {
+      alert(message);
+    });
+  }
   Highcharts : typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {
     title: {
