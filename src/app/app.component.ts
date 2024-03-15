@@ -12,13 +12,38 @@ import * as Highcharts from "highcharts";
 export class AppComponent {
   connection : signalR.HubConnection; 
   constructor() {
-    this.connection = new signalr.HubConnectionBuilder().withUrl("https://localhost:7172/charthub").build();      
+    this.connection = new signalr.HubConnectionBuilder().withUrl("https://localhost:7172/charthub").build();
     this.connection.start();
 
-    this.connection.on("receiveMessage", message => {
-      alert(message);
-    });
+    this.connection.on("receiveMessage", datas => {
+       this.chart.showLoading();
+       this.chartOptions = datas;
+
+      for (let i = 0; i < this.chart.series.length; i++) {
+        this.chart.series[i].remove();
+        
+      }
+
+      for (let i = 0; i < datas.length; i++) {
+        this.chart.AddSeries(datas[i]);
+        
+      }
+
+      this.updateFromInput = true;
+      this.chart.hideLoading();
+      
+     });
+    
+    const self = this;
+    this.chartCallback = chart => {
+      self.chart = chart;
+    }
   }
+
+  chart;
+  updateFromInput=false;
+  chartCallback;
+
   Highcharts : typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {
     title: {
